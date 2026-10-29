@@ -1,0 +1,11 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Crear cuenta')}"></head>
+<body class="d-flex flex-column min-vh-100"><nav th:replace="~{layout :: nav}"></nav>
+<main class="container mt-5" style="max-width:460px"><h1 class="h3 fw-bold" style="color:var(--azul-osc)">Crear cuenta</h1>
+  <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+  <form th:action="@{/registro}" method="post">
+    <label class="form-label">Nombre</label><input class="form-control mb-3" name="nombre" required>
+    <label class="form-label">Correo</label><input class="form-control mb-3" name="email" type="email" required>
+    <label class="form-label">Contraseña</label><input class="form-control mb-3" name="password" type="password" minlength="6" required>
+    <button class="btn btn-menos w-100">Crear cuenta</button></form></main>
+<footer th:replace="~{layout :: footer}"></footer><th:block th:replace="~{layout :: scripts}"></th:block></body></html>

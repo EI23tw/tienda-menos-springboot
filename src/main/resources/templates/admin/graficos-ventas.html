@@ -1,0 +1,19 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Gráficos de ventas')}"></head>
+<body class="d-flex flex-column min-vh-100">
+  <nav th:replace="~{layout :: nav}"></nav>
+  <main class="container mt-4"><h1 class="fw-bold" style="color:var(--azul-osc)">Gráficos de ventas</h1>
+    <p class="text-secondary">Solo cuentan los pedidos aprobados. Realiza algunas compras para ver datos.</p>
+    <div class="row g-4"><div class="col-lg-6"><div class="mp-card p-3"><h2 class="h6">Ventas por día (líneas)</h2><canvas id="linea"></canvas></div></div>
+    <div class="col-lg-6"><div class="mp-card p-3"><h2 class="h6">Ventas por producto (barras)</h2><canvas id="barra"></canvas></div></div></div>
+  </main>
+  <footer th:replace="~{layout :: footer}"></footer>
+  <th:block th:replace="~{layout :: scripts}"></th:block>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script th:inline="javascript">
+    const azul='#1F7BDB', rojo='#E63B3B';
+    new Chart(document.getElementById('linea'),{type:'line',data:{labels:/*[[${dias}]]*/[],datasets:[{label:'Ventas (S/)',data:/*[[${ventasDia}]]*/[],borderColor:azul,backgroundColor:'rgba(31,123,219,.15)',fill:true,tension:.3}]}});
+    new Chart(document.getElementById('barra'),{type:'bar',data:{labels:/*[[${productos}]]*/[],datasets:[{label:'Ventas (S/)',data:/*[[${ventasProd}]]*/[],backgroundColor:rojo}]}});
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Panel · Pedidos')}"></head>
+<body class="d-flex flex-column min-vh-100">
+  <nav th:replace="~{layout :: nav}"></nav>
+  <main class="container mt-4"><h1 class="fw-bold" style="color:var(--azul-osc)">Pedidos</h1>
+    <p>Ventas aprobadas: <span class="precio" th:text="'S/ ' + ${#numbers.formatDecimal(ventas,1,2)}"></span></p>
+    <div class="table-responsive"><table class="table tabla align-middle">
+      <thead><tr><th>#</th><th>Fecha</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Ref. pago</th><th>Estado</th></tr></thead>
+      <tbody><tr th:each="p : ${pedidos}"><td th:text="${p.id}"></td><td th:text="${#temporals.format(p.fecha,'dd/MM HH:mm')}"></td><td th:text="${p.usuario.email}"></td>
+        <td class="small"><div th:each="i : ${p.items}" th:text="${i.cantidad} + ' × ' + ${i.producto.nombre}"></div></td>
+        <td th:text="'S/ ' + ${#numbers.formatDecimal(p.total,1,2)}"></td><td th:text="${p.referenciaPago}"></td>
+        <td><form th:action="@{/admin/pedidos/{id}/estado(id=${p.id})}" method="post" class="d-flex gap-1">
+          <select name="estado" class="form-select form-select-sm"><option th:each="e : ${ {'PAGADO','ENTREGADO','RECHAZADO'} }" th:value="${e}" th:text="${e}" th:selected="${e==p.estado}"></option></select>
+          <button class="btn btn-sm btn-menos">OK</button></form></td></tr></tbody></table></div>
+  </main>
+  <footer th:replace="~{layout :: footer}"></footer>
+  <th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

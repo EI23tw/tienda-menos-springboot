@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Pago')}"></head>
+<body>
+<div class="overlay" id="ov">
+  <div class="spinner-border" style="color:var(--mp);width:3rem;height:3rem"></div>
+  <p class="mt-3 fw-semibold">Procesando tu pedido…</p>
+</div>
+
+<div class="mp-head">
+  <div class="container d-flex justify-content-between align-items-center">
+    <span class="fs-4 fw-bold">Checkout <small class="fs-6 fw-normal">(simulación)</small></span>
+    <a class="text-white small" th:href="@{/cesta}">Volver a la cesta</a>
+  </div>
+</div>
+
+<main class="container mt-4">
+  <div class="row g-4">
+    <!-- COLUMNA IZQUIERDA: FORMULARIO DE PAGO -->
+    <div class="col-lg-7">
+      <div class="mp-card p-4">
+        <h1 class="h4 mb-3">Detalles de Pago</h1>
+        
+        <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+        
+        <form id="f" th:action="@{/pago/procesar}" method="post">
+          
+          <label class="form-label fw-bold">Método de pago</label>
+          <select class="form-select mb-4" name="metodo" id="metodoPago" onchange="toggleCampos()">
+            <option value="Tarjeta">Tarjeta de Crédito/Débito</option>
+            <option value="Yape">Yape / Plin</option>
+            <option value="Efectivo">Efectivo (Pago contra entrega)</option>
+          </select>
+
+          <div id="camposTarjeta">
+            <label class="form-label">Número de tarjeta</label>
+            <input id="num" class="form-control mb-3 tarjeta-input" name="numero" inputmode="numeric" placeholder="4509 9535 6623 3704" maxlength="19" required>
+            
+            <label class="form-label">Nombre del titular</label>
+            <input class="form-control mb-3 tarjeta-input" name="titular" required>
+            
+            <div class="row">
+              <div class="col">
+                <label class="form-label">Vencimiento</label>
+                <input class="form-control mb-3 tarjeta-input" placeholder="MM/AA" maxlength="5" required>
+              </div>
+              <div class="col">
+                <label class="form-label">CVV</label>
+                <input class="form-control mb-3 tarjeta-input" type="password" maxlength="4" required>
+              </div>
+            </div>
+            <p class="small text-secondary mt-1 mb-3">Prueba: cualquier tarjeta de 16 dígitos se aprueba; una terminada en <strong>0000</strong> se rechaza.</p>
+          </div>
+
+          <div id="mensajeAlternativo" class="alert alert-info mb-4" style="display: none;">
+            Has seleccionado pago con <strong id="nombreMetodo"></strong>. <br>
+            Completa la transacción para registrar tu pedido.
+          </div>
+
+          <button class="btn w-100 text-white" style="background:var(--mp)">Pagar <span th:text="'S/ ' + ${#numbers.formatDecimal(totalFinal,1,2)}"></span></button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- COLUMNA DERECHA: RESUMEN Y CUPÓN -->
+    <div class="col-lg-5">
+      <div class="mp-card p-4">
+        <h2 class="h5">Resumen de compra</h2>
+        <div class="d-flex justify-content-between small py-1" th:each="l : ${lineas}">
+          <span th:text="${l.cantidad} + ' × ' + ${l.producto.nombre}"></span>
+          <span th:text="'S/ ' + ${#numbers.formatDecimal(l.subtotal,1,2)}"></span>
+        </div>
+        <hr>
+        
+        <!-- ZONA DE CUPÓN DE DESCUENTO -->
+        <form th:action="@{/pago/cupon}" method="post" class="mb-3" th:if="${cupon == null}">
+            <label class="form-label small fw-bold">¿Tienes un cupón de descuento?</label>
+            <div class="input-group input-group-sm">
+                <input type="text" name="codigo" class="form-control" placeholder="Ej: MENOS10" required>
+                <button class="btn btn-outline-secondary" type="submit">Aplicar</button>
+            </div>
+            <div class="text-danger small mt-1" th:if="${errorCupon}" th:text="${errorCupon}"></div>
+        </form>
+
+        <div th:if="${cupon != null}" class="alert alert-success py-2 px-3 small mb-3">
+            <div class="fw-bold">Cupón aplicado: <span th:text="${cupon.codigo}"></span></div>
+            Descuento del <span th:text="${#numbers.formatDecimal(cupon.porcentajeDescuento,1,0)}"></span>% activado.
+        </div>
+        <div class="text-success small mb-3" th:if="${mensajeCupon}" th:text="${mensajeCupon}"></div>
+
+        <!-- CÁLCULO DE TOTALES -->
+        <div class="d-flex justify-content-between small text-secondary">
+          <span>Subtotal</span>
+          <span th:text="'S/ ' + ${#numbers.formatDecimal(subtotal,1,2)}"></span>
+        </div>
+        
+        <div class="d-flex justify-content-between small text-danger" th:if="${cupon != null}">
+          <span>Descuento</span>
+          <span th:text="'- S/ ' + ${#numbers.formatDecimal(descuento,1,2)}"></span>
+        </div>
+        
+        <hr class="my-2">
+        <div class="d-flex justify-content-between fw-bold fs-5">
+          <span>Total a Pagar</span>
+          <span th:text="'S/ ' + ${#numbers.formatDecimal(totalFinal,1,2)}"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+function toggleCampos() {
+    var metodo = document.getElementById('metodoPago').value;
+    var camposTarjeta = document.getElementById('camposTarjeta');
+    var mensajeAlternativo = document.getElementById('mensajeAlternativo');
+    var inputsTarjeta = document.querySelectorAll('.tarjeta-input');
+
+    if (metodo === 'Tarjeta') {
+        camposTarjeta.style.display = 'block';
+        mensajeAlternativo.style.display = 'none';
+        for (var i = 0; i < inputsTarjeta.length; i++) {
+            inputsTarjeta[i].required = true;
+        }
+    } else {
+        camposTarjeta.style.display = 'none';
+        mensajeAlternativo.style.display = 'block';
+        document.getElementById('nombreMetodo').innerText = metodo;
+        for (var i = 0; i < inputsTarjeta.length; i++) {
+            inputsTarjeta[i].required = false;
+        }
+    }
+}
+
+document.getElementById('num').addEventListener('input', function(e) {
+  e.target.value = e.target.value.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
+});
+
+document.getElementById('f').addEventListener('submit', function(e) {
+  e.preventDefault();
+  document.getElementById('ov').style.display = 'flex';
+  var form = e.target;
+  setTimeout(function() { form.submit(); }, 1800);
+});
+</script>
+</body>
+</html>

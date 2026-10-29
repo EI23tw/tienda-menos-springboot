@@ -1,0 +1,10 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Resultado del pago')}"></head>
+<body class="d-flex flex-column min-vh-100"><nav th:replace="~{layout :: nav}"></nav>
+<main class="container mt-5 text-center" style="max-width:560px">
+  <div th:if="${pedido.estado=='RECHAZADO'}"><div class="display-3">✖️</div><h1 class="h3 text-danger">Pago rechazado</h1>
+    <p>La tarjeta terminada en <strong th:text="${pedido.tarjetaUltimos4}"></strong> no fue aprobada. Tu cesta sigue guardada.</p><a class="btn btn-rojo" th:href="@{/pago}">Intentar con otra tarjeta</a></div>
+  <div th:unless="${pedido.estado=='RECHAZADO'}"><div class="display-3">✅</div><h1 class="h3" style="color:var(--azul-osc)">¡Pago aprobado!</h1>
+    <p>Compra <strong th:text="'#' + ${pedido.id}"></strong> · Ref. <strong th:text="${pedido.referenciaPago}"></strong><br>Total pagado: <span class="precio" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total,1,2)}"></span></p>
+    <a class="btn btn-menos" th:href="@{/mis-compras}">Ver mis compras</a></div></main>
+<footer th:replace="~{layout :: footer}"></footer><th:block th:replace="~{layout :: scripts}"></th:block></body></html>

@@ -1,0 +1,11 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Mis compras')}"></head>
+<body class="d-flex flex-column min-vh-100"><nav th:replace="~{layout :: nav}"></nav>
+<main class="container mt-4"><h1 class="fw-bold" style="color:var(--azul-osc)">Mis compras</h1>
+  <p th:if="${pedidos.isEmpty()}" class="text-secondary">Aún no tienes compras.</p>
+  <div class="mp-card p-3 mb-3" th:each="p : ${pedidos}">
+    <div class="d-flex justify-content-between flex-wrap"><strong th:text="'Compra #' + ${p.id} + ' · ' + ${#temporals.format(p.fecha,'dd/MM/yyyy HH:mm')}"></strong>
+      <span class="badge" th:classappend="${p.estado=='RECHAZADO'}?'bg-danger':'bg-success'" th:text="${p.estado}"></span></div>
+    <ul class="small mb-1 mt-2"><li th:each="i : ${p.items}" th:text="${i.cantidad} + ' × ' + ${i.producto.nombre}"></li></ul>
+    <div class="fw-bold" th:text="'Total: S/ ' + ${#numbers.formatDecimal(p.total,1,2)}"></div></div></main>
+<footer th:replace="~{layout :: footer}"></footer><th:block th:replace="~{layout :: scripts}"></th:block></body></html>

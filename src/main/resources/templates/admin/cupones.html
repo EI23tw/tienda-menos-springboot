@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Gestión de Cupones')}"></head>
+<body class="d-flex flex-column min-vh-100">
+  <nav th:replace="~{layout :: nav}"></nav>
+  
+  <main class="container mt-4">
+    <h1 class="fw-bold" style="color:var(--azul-osc)">Cupones de Descuento</h1>
+    
+    <!-- Formulario para agregar nuevo -->
+    <div class="mp-card p-3 mb-4">
+      <form th:action="@{/admin/cupones/nuevo}" method="post" class="row g-2 align-items-center">
+        <div class="col-md-3">
+          <input type="text" name="codigo" class="form-control" placeholder="Código (ej. VERANO20)" required>
+        </div>
+        <div class="col-md-3">
+          <input type="number" name="porcentaje" class="form-control" placeholder="% de Descuento" step="0.01" min="1" max="100" required>
+        </div>
+        <div class="col-md-3">
+          <input type="date" name="fecha" class="form-control" required title="Fecha de vencimiento">
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn w-100 text-white fw-bold" style="background:var(--azul)">Añadir Cupón</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tabla de cupones -->
+    <div class="table-responsive">
+      <table class="table tabla align-middle">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descuento</th>
+            <th>Vencimiento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="c : ${cupones}">
+            <td class="fw-bold" th:text="${c.codigo}"></td>
+            <td th:text="${#numbers.formatDecimal(c.porcentajeDescuento,1,0)} + '%'"></td>
+            <td th:text="${#temporals.format(c.fechaExpiracion, 'dd/MM/yyyy')}"></td>
+            <td>
+              <span class="badge" th:classappend="${c.activo ? 'bg-success' : 'bg-secondary'}" th:text="${c.activo ? 'Activo' : 'Inactivo'}"></span>
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <!-- Botón para desactivar/activar -->
+                <form th:action="@{/admin/cupones/{id}/estado(id=${c.id})}" method="post">
+                  <button type="submit" class="btn btn-sm btn-outline-secondary" th:text="${c.activo ? 'Desactivar' : 'Activar'}"></button>
+                </form>
+                <!-- Botón para eliminar -->
+                <form th:action="@{/admin/cupones/{id}/eliminar(id=${c.id})}" method="post" onsubmit="return confirm('¿Seguro que deseas eliminar este cupón?');">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+  
+  <footer th:replace="~{layout :: footer}"></footer>
+  <th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

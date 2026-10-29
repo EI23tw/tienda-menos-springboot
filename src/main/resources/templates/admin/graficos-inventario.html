@@ -1,0 +1,15 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Gráficos de inventario')}"></head>
+<body><nav th:replace="~{layout :: nav}"></nav>
+<main class="container mt-4"><h1 class="fw-bold" style="color:var(--azul-osc)">Inventario y pedidos</h1>
+  <div class="row g-4"><div class="col-12"><div class="mp-card p-3"><h2 class="h6">Stock por producto (barras)</h2><canvas id="stock" height="90"></canvas></div></div>
+  <div class="col-md-6"><div class="mp-card p-3"><h2 class="h6">Pedidos por estado (círculo)</h2><canvas id="estado"></canvas></div></div>
+  <div class="col-md-6"><div class="mp-card p-3"><h2 class="h6">Productos por categoría (circular)</h2><canvas id="cat"></canvas></div></div></div></main>
+<footer th:replace="~{layout :: footer}"></footer><th:block th:replace="~{layout :: scripts}"></th:block>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+const pal=['#1F7BDB','#E63B3B','#0B3D75','#6FB1F2','#F28B8B','#9DB7D5'];
+new Chart(document.getElementById('stock'),{type:'bar',data:{labels:/*[[${nombres}]]*/[],datasets:[{label:'Unidades',data:/*[[${stocks}]]*/[],backgroundColor:'#1F7BDB'}]}});
+new Chart(document.getElementById('estado'),{type:'pie',data:{labels:/*[[${estados}]]*/[],datasets:[{data:/*[[${cantEstados}]]*/[],backgroundColor:pal}]}});
+new Chart(document.getElementById('cat'),{type:'doughnut',data:{labels:/*[[${cats}]]*/[],datasets:[{data:/*[[${cantCats}]]*/[],backgroundColor:pal}]}});
+</script></body></html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Productos')}"></head>
+<body class="d-flex flex-column min-vh-100"><nav th:replace="~{layout :: nav}"></nav>
+<section class="hero"><div class="container">
+  <h1>Menos precio.<br>Más cesta<span class="punto">•</span></h1>
+  <p class="lead mt-3 mb-0">Elige tus productos, arma tu cesta y paga en línea.</p></div></section>
+<main class="container mt-4">
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a class="pill" th:classappend="${cat==null}?'on'" th:href="@{/}">Todos</a>
+    <a class="pill" th:each="c : ${categorias}" th:classappend="${c==cat}?'on'" th:href="@{/(cat=${c})}" th:text="${c}"></a></div>
+  <div class="row g-4">
+    <div class="col-6 col-md-4 col-lg-3" th:each="p : ${productos}"><div class="prod d-flex flex-column">
+      <div class="foto"><img th:if="${p.imagen != null and !p.imagen.isBlank()}" th:src="@{${p.imagen}}" th:alt="${p.nombre}" class="prod-img"><span th:unless="${p.imagen != null and !p.imagen.isBlank()}" th:text="${p.emoji}" aria-hidden="true"></span></div>
+      <div class="p-3 d-flex flex-column flex-grow-1">
+        <h2 class="h6 fw-bold" th:text="${p.nombre}"></h2><p class="small text-secondary mb-2" th:text="${p.descripcion}"></p>
+        <div class="precio mt-auto" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio,1,2)}"></div>
+        <form th:action="@{/cesta/cambiar/{id}(id=${p.id})}" method="post" class="mt-2">
+          <input type="hidden" name="delta" value="1">
+          <button class="btn btn-rojo w-100" th:disabled="${p.stock==0}" th:text="${p.stock==0} ? 'Agotado' : 'Agregar a la cesta'"></button></form>
+      </div></div></div></div></main>
+<footer th:replace="~{layout :: footer}"></footer><th:block th:replace="~{layout :: scripts}"></th:block></body></html>
